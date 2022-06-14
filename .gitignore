@@ -130,3 +130,9 @@ dmypy.json
 
 # .idea
 .idea
+
+.vscode
+media
+db
+django_static
+docker-compose-dev.yml
