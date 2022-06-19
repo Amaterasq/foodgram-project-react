@@ -1,9 +1,9 @@
-from rest_framework import serializers
-from djoser.serializers import UserCreateSerializer, TokenCreateSerializer
-
 from api.models import Recipe
-from users.models import User, Follow
+from django.shortcuts import get_object_or_404
+from djoser.serializers import TokenCreateSerializer, UserCreateSerializer
+from rest_framework import serializers
 from users.exceptions import FollowValidationError
+from users.models import Follow, User
 
 
 class UserRegistrationSerializer(UserCreateSerializer):
@@ -38,7 +38,7 @@ class UserSerializer(serializers.ModelSerializer):
         )
 
     def get_is_subscribed(self, obj):
-        request = self.context.get('request', None)
+        request = self.context.get('request')
         if request.user.is_anonymous:
             return False
         user = request.user
@@ -108,18 +108,24 @@ class SubscriptionSerializer(serializers.ModelSerializer):
                 limit = int(limit)
                 queryset = queryset[:limit]
             except ValueError:
-                pass
+                raise ValueError(
+                    detail='Ошибка в получении queryset-limit'
+                )
         serializer = SubscriptionRecipeSerializer(queryset, many=True)
         return serializer.data
 
     def validate(self, data):
         """Валидация некорректных вариантов подписки."""
-        user = User.objects.get(id=self.context['request'].user.id)
-        author = User.objects.get(id=self.context['author'])
-        if user == author:
+        author = get_object_or_404(User, id=self.context['author'])
+        if self.context['request'].user == author:
             raise FollowValidationError(
-                detail='Нельзя подписываться на самого себя')
-        if Follow.objects.filter(user=user, author=author).exists():
+                detail='Нельзя подписываться на самого себя'
+            )
+        if Follow.objects.filter(
+            user=self.context['request'].user,
+            author=author
+        ).exists():
             raise FollowValidationError(
-                f'Вы уже подписаны на {author.username}')
+                f'Вы уже подписаны на {author.username}'
+            )
         return data

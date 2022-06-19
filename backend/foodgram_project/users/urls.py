@@ -1,8 +1,6 @@
-from django.urls import include, path
 from django.conf.urls import url
-
+from django.urls import include, path
 from rest_framework.routers import DefaultRouter
-
 from users import views
 
 app_name = 'users'
@@ -16,7 +14,8 @@ users_router.register(
 )
 users_router.register(
     r'(?P<author_id>\d+)/subscribe',
-    views.SubscriptionCreateDestroy, basename='subscribe'
+    views.SubscriptionCreateDestroy,
+    basename='subscribe'
 )
 
 
@@ -26,7 +25,8 @@ urlpatterns = [
         'users/',
         views.UserViewSet.as_view(
             {'get': 'list', 'post': 'create'}
-        )
+        ),
+        name='get_create_user'
     ),
     path('', include('djoser.urls')),
     url(r'^auth/', include('djoser.urls.authtoken')),

@@ -1,9 +1,8 @@
-from pathlib import Path
 import os
 from os.path import join
+from pathlib import Path
 
 from dotenv import load_dotenv
-
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -11,11 +10,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 dotenv_path = join(BASE_DIR, '.env')
 load_dotenv(dotenv_path)
 
-## SECRET_KEY = os.getenv('SECRET_KEY')
-SECRET_KEY = 'django-insecure-6e5$)8odtc8eo7-a+!l@8z=@nntcwc29j-68cml3f#mrmrb9s@'
-
-## DEBUG = os.getenv('DEBUG')
-DEBUG = True
+SECRET_KEY = os.getenv('SECRET_KEY', default='secret_key')
+DEBUG = os.getenv('DEBUG')
 
 ALLOWED_HOSTS = (
     'backend',
@@ -73,7 +69,7 @@ TEMPLATES = [
 WSGI_APPLICATION = 'foodgram_project.wsgi.application'
 
 # Database
-'''
+
 DATABASES = {
     'default': {
         'ENGINE': os.getenv('DB_ENGINE'),
@@ -84,15 +80,15 @@ DATABASES = {
         'PORT': os.getenv('DB_PORT')
     }
 }
-'''
 
+'''
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-
+'''
 
 AUTH_USER_MODEL = 'users.User'
 
@@ -170,5 +166,4 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# MIN_COOKING_TIME = 1
 SHOPPING_LIST_NAME = 'shopping_list.txt'

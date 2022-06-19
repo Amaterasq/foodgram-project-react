@@ -1,9 +1,8 @@
-from django.core.management.base import BaseCommand
-
 import csv
-from colorama import init, Fore
 
 from api.models import Ingredient
+from colorama import Fore, init
+from django.core.management.base import BaseCommand
 
 init(autoreset=True)
 

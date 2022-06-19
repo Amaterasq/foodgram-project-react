@@ -1,34 +1,21 @@
-from django.shortcuts import get_object_or_404
-from django.http import HttpResponse
-from django.db.models import Sum
+from api.filters import IngredientFilter, RecipeFilter
+from api.models import (Favorite, Ingredient, Recipe, RecipeIngredient,
+                        ShoppingCart, Tag)
+from api.paginations import LimitResultsSetPagination
+from api.permissions import IsAdminOrReadOnly, OwnerAdminReadOnly
+from api.serializers import (FavoriteCreateSerializer, IngredientSerializer,
+                             RecipeCreateSerializer, RecipeSerializer,
+                             ShoppingCartCreateSerializer, TagSerializer)
 from django.conf import settings
+from django.db.models import Sum
+from django.http import HttpResponse
+from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-
-from rest_framework import viewsets, mixins, status
-from rest_framework.response import Response
+from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, SAFE_METHODS
+from rest_framework.response import Response
 from rest_framework.views import APIView
-
-from api.serializers import (
-    IngredientSerializer,
-    TagSerializer,
-    RecipeSerializer,
-    RecipeCreateSerializer,
-    FavoriteCreateSerializer,
-    ShoppingCartCreateSerializer,
-)
-from api.models import (
-    Ingredient,
-    Tag,
-    Recipe,
-    Favorite,
-    ShoppingCart,
-    RecipeIngredient
-)
-from api.filters import IngredientFilter, RecipeFilter
-from api.paginations import LimitResultsSetPagination
-from api.permissions import OwnerAdminReadOnly, IsAdminOrReadOnly
 
 
 class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
@@ -46,10 +33,10 @@ class TagViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
-    serializer_class = RecipeSerializer
+    queryset = Recipe.objects.all()
     pagination_class = LimitResultsSetPagination
     filter_backends = (DjangoFilterBackend,)
-    filterset_class = RecipeFilter
+    filter_class = RecipeFilter
     permission_classes = (OwnerAdminReadOnly,)
 
     def get_serializer_class(self):
@@ -57,61 +44,20 @@ class RecipeViewSet(viewsets.ModelViewSet):
             return RecipeSerializer
         return RecipeCreateSerializer
 
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        serializer = RecipeSerializer(
-            instance=serializer.instance,
-            context={'request': self.request}
-        )
-        return Response(
-            serializer.data, status=status.HTTP_201_CREATED
-        )
-
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
 
-    def update(self, request, *args, **kwargs):
-        instance = self.get_object()
-        serializer = self.get_serializer(
-            instance,
-            data=request.data,
-            partial=True
-        )
-        serializer.is_valid(raise_exception=True)
-        self.perform_update(serializer)
-        serializer = RecipeSerializer(
-            instance=serializer.instance,
-            context={'request': self.request},
-        )
-        return Response(
-            serializer.data, status=status.HTTP_200_OK
-        )
 
-    def get_queryset(self):
-        queryset = Recipe.objects.all()
-        user = self.request.user
-        is_favorited = self.request.query_params.get(
-            'is_favorited'
-        )
-        is_in_shopping_cart = (
-            self.request.query_params.get('is_in_shopping_cart')
-        )
-
-        if is_favorited == '1':
-            queryset = queryset.filter(favorite__user=user)
-        if is_in_shopping_cart == '1':
-            queryset = queryset.filter(shopping_cart__user=user)
-
-        return queryset
-
-
-class FavoriteViewSet(
+class CreateDestroyMixin(
     mixins.CreateModelMixin,
     mixins.DestroyModelMixin,
     viewsets.GenericViewSet
 ):
+    '''Миксин для наследования FavoriteViewSet, ShoppingCartViewSet'''
+    pass
+
+
+class FavoriteViewSet(CreateDestroyMixin):
     serializer_class = FavoriteCreateSerializer
 
     def create(self, request, *args, **kwargs):
@@ -146,11 +92,7 @@ class FavoriteViewSet(
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class ShoppingCartViewSet(
-    mixins.CreateModelMixin,
-    mixins.DestroyModelMixin,
-    viewsets.GenericViewSet
-):
+class ShoppingCartViewSet(CreateDestroyMixin):
     serializer_class = ShoppingCartCreateSerializer
 
     def create(self, request, *args, **kwargs):
