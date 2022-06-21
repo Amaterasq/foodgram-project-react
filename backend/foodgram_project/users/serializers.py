@@ -1,7 +1,8 @@
-from api.models import Recipe
 from django.shortcuts import get_object_or_404
 from djoser.serializers import TokenCreateSerializer, UserCreateSerializer
 from rest_framework import serializers
+
+from api.models import Recipe
 from users.exceptions import FollowValidationError
 from users.models import Follow, User
 

@@ -1,12 +1,12 @@
 from collections import OrderedDict
 
-from api.fields import Base64ImageField
-from api.models import (Favorite, Ingredient, Recipe, RecipeIngredient,
-                        ShoppingCart, Tag)
-# from django.db import transaction
 from django.core.exceptions import ValidationError
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
+
+from api.fields import Base64ImageField
+from api.models import (Favorite, Ingredient, Recipe, RecipeIngredient,
+                        ShoppingCart, Tag)
 from users.serializers import UserSerializer
 
 

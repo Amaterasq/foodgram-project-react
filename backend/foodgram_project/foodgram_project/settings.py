@@ -69,7 +69,7 @@ TEMPLATES = [
 WSGI_APPLICATION = 'foodgram_project.wsgi.application'
 
 # Database
-
+'''
 DATABASES = {
     'default': {
         'ENGINE': os.getenv('DB_ENGINE'),
@@ -80,15 +80,15 @@ DATABASES = {
         'PORT': os.getenv('DB_PORT')
     }
 }
-
 '''
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-'''
+
 
 AUTH_USER_MODEL = 'users.User'
 
