@@ -4,7 +4,6 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 dotenv_path = join(BASE_DIR, '.env')
@@ -68,8 +67,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'foodgram_project.wsgi.application'
 
-# Database
-'''
 DATABASES = {
     'default': {
         'ENGINE': os.getenv('DB_ENGINE'),
@@ -80,19 +77,8 @@ DATABASES = {
         'PORT': os.getenv('DB_PORT')
     }
 }
-'''
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
-
 
 AUTH_USER_MODEL = 'users.User'
-
-# Password validation
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -109,8 +95,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-# Djoser base settings
-
 DJOSER = {
     'LOGIN_FIELD': 'email',
     'PERMISSIONS': {
@@ -126,7 +110,6 @@ DJOSER = {
     }
 }
 
-
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticatedOrReadOnly',
@@ -141,8 +124,6 @@ REST_FRAMEWORK = {
 }
 
 
-# Internationalization
-
 LANGUAGE_CODE = 'ru-RU'
 
 TIME_ZONE = 'UTC'
@@ -154,15 +135,11 @@ USE_L10N = True
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
-
 STATIC_URL = '/django_static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'django_static')
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-
-# Default primary key field type
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 

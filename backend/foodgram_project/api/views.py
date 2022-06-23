@@ -1,15 +1,14 @@
 from django.conf import settings
 from django.db.models import Sum
 from django.http import HttpResponse
-from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import mixins, status, viewsets
+from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import SAFE_METHODS, IsAuthenticated
-from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from api.filters import IngredientFilter, RecipeFilter
+from api.mixins import CreateDestroyMixin
 from api.models import (Favorite, Ingredient, Recipe, RecipeIngredient,
                         ShoppingCart, Tag)
 from api.paginations import LimitResultsSetPagination
@@ -49,103 +48,46 @@ class RecipeViewSet(viewsets.ModelViewSet):
         serializer.save(author=self.request.user)
 
 
-class CreateDestroyMixin(
-    mixins.CreateModelMixin,
-    mixins.DestroyModelMixin,
-    viewsets.GenericViewSet
-):
-    '''Миксин для наследования FavoriteViewSet, ShoppingCartViewSet'''
-    pass
-
-
 class FavoriteViewSet(CreateDestroyMixin):
     serializer_class = FavoriteCreateSerializer
+    model = Favorite
 
     def create(self, request, *args, **kwargs):
-        recipe = get_object_or_404(
-            Recipe, id=self.kwargs.get('recipe_id')
-        )
-        user = self.request.user
-        in_favorite = Favorite.objects.filter(
-            user=user, recipe=recipe).exists()
-        if in_favorite:
-            content = {'error': f'{recipe.name} уже был добавлен в избранное'}
-            return Response(content, status=status.HTTP_400_BAD_REQUEST)
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-    def perform_create(self, serializer):
-        recipe = get_object_or_404(
-            Recipe, id=self.kwargs.get('recipe_id')
-        )
-        serializer.save(user=self.request.user, recipe=recipe)
+        return self.add_obj(request, self.model, *args, **kwargs)
 
     @action(methods=['delete'], detail=False)
     def delete(self, request, *args, **kwargs):
-        instance = get_object_or_404(
-            Favorite,
-            recipe=self.kwargs.get('recipe_id'),
-            user=request.user.id
-        )
-        self.perform_destroy(instance)
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        return self.del_obj(request, self.model, *args, **kwargs)
 
 
 class ShoppingCartViewSet(CreateDestroyMixin):
     serializer_class = ShoppingCartCreateSerializer
+    model = ShoppingCart
 
     def create(self, request, *args, **kwargs):
-        recipe = get_object_or_404(
-            Recipe, id=self.kwargs.get('recipe_id')
-        )
-        user = self.request.user
-        in_shopping_cart = ShoppingCart.objects.filter(
-            user=user, recipe=recipe).exists()
-        if in_shopping_cart:
-            content = {
-                'error': f'{recipe.name} уже добавлен в корзину покупок!'
-            }
-            return Response(content, status=status.HTTP_400_BAD_REQUEST)
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-    def perform_create(self, serializer):
-        recipe = get_object_or_404(
-            Recipe, id=self.kwargs.get('recipe_id')
-        )
-        serializer.save(user=self.request.user, recipe=recipe)
+        return self.add_obj(request, self.model, *args, **kwargs)
 
     @action(methods=['delete'], detail=False)
     def delete(self, request, *args, **kwargs):
-        instance = get_object_or_404(
-            ShoppingCart,
-            recipe=self.kwargs.get('recipe_id'),
-            user=request.user.id
-        )
-        self.perform_destroy(instance)
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        return self.del_obj(request, self.model, *args, **kwargs)
 
 
 class DownloadShoppingCart(APIView):
     permission_classes = (IsAuthenticated,)
 
-    def _create_shopping_list(self, queryset, response):
+    def _create_shopping_list(self, request, response):
         unique_ingredient = []
         response.write('Список продуктов:\n')
         ingredients = RecipeIngredient.objects.filter(
-            recipe__in=queryset.values("recipe")
-        )
+            recipe__shopping_cart__user=request.user
+        ).values_list(
+            'ingredient__name',
+            'ingredient__measurement_unit',
+        ).annotate(amount=Sum('amount'))
         for item in ingredients:
             if item.ingredient.id not in unique_ingredient:
-                total_amount = RecipeIngredient.objects.filter(
-                    ingredient__id=item.ingredient.id
-                ).aggregate(Sum('amount'))
                 response.write(f'\n{item.ingredient._get_name()}')
-                response.write(f' - {total_amount.get("amount__sum")}')
+                response.write(f' - {item.ingredient["amount"]}')
                 unique_ingredient.append(item.ingredient.id)
         return response
 

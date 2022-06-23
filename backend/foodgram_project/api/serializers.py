@@ -1,7 +1,7 @@
 from collections import OrderedDict
 
 from django.core.exceptions import ValidationError
-from django.shortcuts import get_object_or_404
+# from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 
 from api.fields import Base64ImageField
@@ -134,15 +134,11 @@ class RecipeCreateSerializer(RecipeSerializer):
         return ret
 
     def add_ingredients(self, ingredients, recipes):
-        for ingredient in ingredients:
-            ingredient_id = dict(ingredient)['ingredient']['id']
-            amount = dict(ingredient)['amount']
-            current_ingredient = get_object_or_404(
-                Ingredient, id=ingredient_id
-            )
-            RecipeIngredient.objects.create(
-                ingredient=current_ingredient, recipe=recipes, amount=amount
-            )
+        RecipeIngredient.objects.bulk_create([RecipeIngredient(
+            ingredient=dict(ingredient)['ingredient'],
+            recipe=recipes,
+            amount=dict(ingredient)['amount'],
+        ) for ingredient in ingredients])
         return recipes
 
     def create(self, validated_data):
