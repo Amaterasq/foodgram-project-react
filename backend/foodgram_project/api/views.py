@@ -83,11 +83,11 @@ class DownloadShoppingCart(APIView):
         ).values_list(
             'ingredient__name',
             'ingredient__measurement_unit',
-        ).annotate(amount=Sum('amount'))
+        ).annotate(total_amount=Sum('amount'))
         for item in ingredients:
             if item.ingredient.id not in unique_ingredient:
                 response.write(f'\n{item.ingredient._get_name()}')
-                response.write(f' - {item.ingredient["amount"]}')
+                response.write(f' - {item.ingredient["total_amount"]}')
                 unique_ingredient.append(item.ingredient.id)
         return response
 

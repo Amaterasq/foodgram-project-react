@@ -1,7 +1,6 @@
 from collections import OrderedDict
 
 from django.core.exceptions import ValidationError
-# from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 
 from api.fields import Base64ImageField
