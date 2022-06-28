@@ -16,6 +16,7 @@ ALLOWED_HOSTS = (
     'backend',
     '127.0.0.1',
     'localhost',
+    '178.154.199.211'
 )
 
 INSTALLED_APPS = [
