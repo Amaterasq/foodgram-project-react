@@ -60,6 +60,6 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           script: |
             sudo docker pull amaterasq/foodgram_backend:latest
-            cd infra/
+            cd foodgram-project-react/infra/
             sudo docker-compose stop
             sudo docker-compose up --always-recreate-deps -d
