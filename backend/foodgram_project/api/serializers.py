@@ -1,6 +1,7 @@
 from collections import OrderedDict
 
-from django.core.exceptions import ValidationError
+#  from django.core.exceptions import ValidationError
+#  from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 
 from api.fields import Base64ImageField
@@ -107,6 +108,7 @@ class RecipeCreateSerializer(RecipeSerializer):
             'is_in_shopping_cart', 'name', 'image', 'text', 'cooking_time',
         )
 
+    '''
     def validate_ingredients(self, attrs):
         id_list = []
         for attr in attrs:
@@ -118,6 +120,7 @@ class RecipeCreateSerializer(RecipeSerializer):
         if len(attrs) == len(id_list_set):
             return attrs
         raise ValidationError('Ингредиенты не уникальны')
+    '''
 
     def to_representation(self, instance):
         '''Изменение сериализатора отображения'''
