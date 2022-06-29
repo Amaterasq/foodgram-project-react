@@ -12,24 +12,26 @@ from api.mixins import CreateDestroyMixin
 from api.models import (Favorite, Ingredient, Recipe, RecipeIngredient,
                         ShoppingCart, Tag)
 from api.paginations import LimitResultsSetPagination
-from api.permissions import IsAdminOrReadOnly, OwnerAdminReadOnly
+from api.permissions import OwnerAdminReadOnly
 from api.serializers import (FavoriteCreateSerializer, IngredientSerializer,
                              RecipeCreateSerializer, RecipeSerializer,
                              ShoppingCartCreateSerializer, TagSerializer)
 
 
 class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
-    permission_classes = (IsAdminOrReadOnly,)
+    #  permission_classes = (IsAdminOrReadOnly,)
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     filter_backends = (IngredientFilter,)
     search_fields = ('^name',)
+    pagination_class = None
 
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
-    permission_classes = (IsAdminOrReadOnly,)
+    #  permission_classes = (IsAdminOrReadOnly,)
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
+    pagination_class = None
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
