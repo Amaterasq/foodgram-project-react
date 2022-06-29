@@ -22,8 +22,9 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     #  permission_classes = (IsAdminOrReadOnly,)
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
-    filter_backends = (IngredientFilter,)
-    search_fields = ('^name',)
+    #  filter_backends = (IngredientFilter,)
+    #  search_fields = ('^name',)
+    filterset_class = IngredientFilter
     pagination_class = None
 
 
