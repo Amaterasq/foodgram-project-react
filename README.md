@@ -76,7 +76,7 @@ DOCKER_USERNAME=<имя пользователя DockerHub>
 USER=<username для подключения к серверу>
 HOST=<IP сервера>
 PASSPHRASE=<пароль для сервера, если он установлен>
-SSH_KEY=<ваш SSH ключ>
+SSH_KEY=<ваш SSH ключ (cat ~/.ssh/id_rsa) >
 ```
 7. Запуск проекта и миграций на удаленном сервере
 ### Собрать docker-compose:
