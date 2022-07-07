@@ -3,7 +3,7 @@
 ![](https://img.shields.io/badge/DjangoRestFramework-3.12.4-red)
 ![](https://badgen.net/badge/icon/postgresql?icon=postgresql&label)
 
-# Foodgram - продуктовый помощник
+# Foodgram - продуктовый помощник (сейчас доступен на http://84.252.138.93/recipes)
 ![workflow](https://github.com/Amaterasq/foodgram-project-react/actions/workflows/foodgram_workflow.yml/badge.svg)
 
 ## Описание проекта
