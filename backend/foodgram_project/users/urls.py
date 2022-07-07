@@ -1,34 +1,19 @@
-from django.conf.urls import url
 from django.urls import include, path
-from rest_framework.routers import DefaultRouter
 
-from users import views
-
-app_name = 'users'
-
-users_router = DefaultRouter()
-
-users_router.register(
-    r'subscriptions',
-    views.SubscriptionViewset,
-    basename='subscriptions'
-)
-users_router.register(
-    r'(?P<author_id>\d+)/subscribe',
-    views.SubscriptionCreateDestroy,
-    basename='subscribe'
-)
+from users.views import FollowApiView, FollowListAPIView
 
 
 urlpatterns = [
-    path('users/', include(users_router.urls)),
     path(
-        'users/',
-        views.UserViewSet.as_view(
-            {'get': 'list', 'post': 'create'}
-        ),
-        name='get_create_user'
+        'users/<int:id>/subscribe/',
+        FollowApiView.as_view(),
+        name='subscribe'
     ),
+    path(
+        'users/subscriptions/',
+        FollowListAPIView.as_view(),
+        name='subscription'
+    ),
+    path('auth/', include('djoser.urls.authtoken')),
     path('', include('djoser.urls')),
-    url(r'^auth/', include('djoser.urls.authtoken')),
 ]

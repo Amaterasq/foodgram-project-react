@@ -1,68 +1,44 @@
-from django.shortcuts import get_object_or_404
-from djoser.views import UserViewSet as DjoserUserViewset
-from rest_framework import mixins, status, viewsets
-from rest_framework.decorators import action
+from rest_framework import status
+from rest_framework.generics import ListAPIView, get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
+from api.paginations import LimitResultsSetPagination
 from users.models import Follow, User
-from users.paginations import LimitResultsSetPagination
-from users.serializers import SubscriptionSerializer, UserSerializer
+from users.serializers import FollowListSerializer, FollowSerializer
 
 
-class UserViewSet(DjoserUserViewset):
+class FollowApiView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, id):
+        data = {'user': request.user.id, 'following': id}
+        serializer = FollowSerializer(data=data, context={'request': request})
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    def delete(self, request, id):
+        user = request.user
+        following = get_object_or_404(User, id=id)
+        follow = get_object_or_404(
+            Follow, user=user, following=following
+        )
+        follow.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class FollowListAPIView(ListAPIView):
     pagination_class = LimitResultsSetPagination
+    permission_classes = [IsAuthenticated]
 
-    def list(self, request):
-        queryset = User.objects.all()
+    def get(self, request):
+        user = request.user
+        queryset = User.objects.filter(following__user=user)
         page = self.paginate_queryset(queryset)
-        serializer = UserSerializer(
-            page, many=True, context={'request': request}
+        serializer = FollowListSerializer(
+            page, many=True,
+            context={'request': request}
         )
         return self.get_paginated_response(serializer.data)
-
-
-class SubscriptionViewset(
-    mixins.ListModelMixin,
-    viewsets.GenericViewSet
-):
-    """Возвращает подписки текущего пользователя"""
-    serializer_class = SubscriptionSerializer
-    pagination_class = LimitResultsSetPagination
-    permission_classes = (IsAuthenticated,)
-
-    def get_queryset(self):
-        user = self.request.user
-        return Follow.objects.filter(user=user)
-
-
-class SubscriptionCreateDestroy(
-    mixins.CreateModelMixin,
-    mixins.DestroyModelMixin,
-    viewsets.GenericViewSet
-):
-    """Создание и удаление подписок."""
-    serializer_class = SubscriptionSerializer
-    permission_classes = (IsAuthenticated,)
-
-    def get_serializer_context(self):
-        context = super().get_serializer_context()
-        context['author'] = int(self.kwargs.get('author_id'))
-        return context
-
-    def perform_create(self, serializer):
-        author = get_object_or_404(
-            User,
-            id=self.kwargs.get('author_id')
-        )
-        serializer.save(user=self.request.user, author=author)
-
-    @action(methods=['delete'], detail=False)
-    def delete(self, request, *args, **kwargs):
-        instance = get_object_or_404(
-            Follow,
-            author=self.kwargs.get('author_id'),
-            user=request.user.id
-        )
-        self.perform_destroy(instance)
-        return Response(status=status.HTTP_204_NO_CONTENT)

@@ -16,7 +16,7 @@ ALLOWED_HOSTS = (
     'backend',
     '127.0.0.1',
     'localhost',
-    '178.154.192.43'
+    '84.252.138.93',
 )
 
 INSTALLED_APPS = [
@@ -28,10 +28,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework.authtoken',
-    'djoser',
-    'django_filters',
     'users.apps.UsersConfig',
     'api.apps.ApiConfig',
+    'djoser',
+    'django_filters',
 ]
 
 MIDDLEWARE = [
@@ -98,17 +98,16 @@ AUTH_PASSWORD_VALIDATORS = [
 
 DJOSER = {
     'LOGIN_FIELD': 'email',
-    'PERMISSIONS': {
-        'user_list': ['rest_framework.permissions.AllowAny'],
-        'user_create': ['rest_framework.permissions.AllowAny'],
-        'user': ['rest_framework.permissions.IsAuthenticated'],
-    },
     'SERIALIZERS': {
-        'user_create': 'users.serializers.UserRegistrationSerializer',
-        'token_create': 'users.serializers.TokenRegistrationSerializer',
-        'user': 'users.serializers.UserSerializer',
-        'current_user': 'users.serializers.UserSerializer'
-    }
+        'user_create': 'users.serializers.CustomUserCreateSerializer',
+        'user': 'users.serializers.CustomUserSerializer',
+        'current_user': 'users.serializers.CustomUserSerializer',
+    },
+    'PERMISSIONS': {
+        'user': ['djoser.permissions.CurrentUserOrAdminOrReadOnly'],
+        'user_list': ['djoser.permissions.CurrentUserOrAdminOrReadOnly']
+    },
+    'HIDE_USERS': False,
 }
 
 REST_FRAMEWORK = {
@@ -118,10 +117,6 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.TokenAuthentication',
     ),
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 25,
-    'DEFAULT_FILTER_BACKENDS': (
-        'django_filters.rest_framework.DjangoFilterBackend',)
 }
 
 

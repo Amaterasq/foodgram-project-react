@@ -8,14 +8,5 @@ class OwnerAdminReadOnly(BasePermission):
         return (
             request.method in SAFE_METHODS
             or obj.author == request.user
-        )
-
-
-class IsAdminOrReadOnly(BasePermission):
-    message = ('Only for admin!')
-
-    def has_permission(self, request, view):
-        return (
-            request.method in SAFE_METHODS
             or request.user and request.user.is_staff
         )

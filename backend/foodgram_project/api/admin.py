@@ -1,68 +1,71 @@
 from django.contrib import admin
 
-from api import models
+from api.models import (Favorite, Ingredient, IngredientInRecipe, Recipe,
+                        ShoppingCart, Tag)
 
 
-class TagInline(admin.StackedInline):
-    model = models.TagsRecipe
-    extra = 1
-
-
-class IngredientInline(admin.StackedInline):
-    model = models.RecipeIngredient
-    extra = 1
-
-
-@admin.register(models.Ingredient)
-class IngredientAdmin(admin.ModelAdmin):
-    list_display = ('name', 'measurement_unit',)
-    search_fields = ('name',)
-    list_filter = ('measurement_unit',)
-
-
-@admin.register(models.Tag)
+@admin.register(Tag)
 class TagAdmin(admin.ModelAdmin):
-    list_display = ('name', 'color', 'slug',)
-    search_fields = ('name', 'color', 'slug')
-
-
-@admin.register(models.Recipe)
-class RecipeAdmin(admin.ModelAdmin):
-    inlines = (TagInline, IngredientInline,)
-
     list_display = (
+        'id',
+        'name',
+        'slug',
+    )
+
+
+@admin.register(Ingredient)
+class IngredientAdmin(admin.ModelAdmin):
+    list_display = (
+        'id',
+        'name',
+        'measurement_unit',
+    )
+    list_filter = ('name',)
+    search_fields = ('name',)
+
+
+@admin.register(Recipe)
+class RecipeAdmin(admin.ModelAdmin):
+    list_display = (
+        'id',
         'name',
         'author',
+        'quantity_favorites',
     )
-    list_filter = ('tags',)
-    search_fields = (
-        'author__username',
-        'author__email',
+    list_filter = (
+        'author',
         'name',
+        'tags',
+    )
+    search_fields = ('name',)
+
+    def quantity_favorites(self, obj):
+        return obj.favorites.count()
+
+
+@admin.register(IngredientInRecipe)
+class IngredientInRecipeAdmin(admin.ModelAdmin):
+    list_display = (
+        'id',
+        'ingredient',
+        'recipe',
+        'amount',
     )
 
 
-@admin.register(models.Favorite)
+@admin.register(Favorite)
 class FavoriteAdmin(admin.ModelAdmin):
     list_display = (
+        'id',
         'user',
         'recipe',
     )
-    search_fields = (
-        'user__username',
-        'user__email',
-        'recipe__name',
-    )
 
 
-@admin.register(models.ShoppingCart)
+@admin.register(ShoppingCart)
 class ShoppingCartAdmin(admin.ModelAdmin):
     list_display = (
+        'id',
         'user',
         'recipe',
-    )
-    search_fields = (
-        'user__username',
-        'user__email',
-        'recipe__name',
     )
