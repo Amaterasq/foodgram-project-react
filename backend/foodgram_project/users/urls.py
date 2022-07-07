@@ -2,7 +2,6 @@ from django.urls import include, path
 
 from users.views import FollowApiView, FollowListAPIView
 
-
 urlpatterns = [
     path(
         'users/<int:id>/subscribe/',

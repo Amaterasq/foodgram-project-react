@@ -3,7 +3,6 @@ from django.contrib.auth.models import Group
 
 from .models import Follow, User
 
-
 admin.site.unregister(Group)
 
 
