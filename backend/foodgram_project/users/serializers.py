@@ -33,7 +33,7 @@ class FollowSerializer(serializers.ModelSerializer):
     is_subscribed = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
-        model = Follow
+        model = User
         fields = ('user', 'following', 'is_subscribed')
         validators = [
             UniqueTogetherValidator(
