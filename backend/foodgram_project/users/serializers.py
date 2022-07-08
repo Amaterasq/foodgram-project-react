@@ -42,7 +42,7 @@ class FollowSerializer(serializers.ModelSerializer):
                 message=('Вы уже подписаны на пользователя')
             )
         ]
-    
+
     def get_is_subscribed(self, obj):
         request = self.context.get('request')
         if not request or request.user.is_anonymous:
