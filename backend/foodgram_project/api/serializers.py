@@ -4,6 +4,7 @@ from rest_framework import serializers
 from api.models import (Favorite, Ingredient, IngredientInRecipe, Recipe,
                         ShoppingCart, Tag)
 from users.serializers import UserSerializer
+from users.models import Follow
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -36,6 +37,7 @@ class RecipeSerializer(serializers.ModelSerializer):
     ingredients = serializers.SerializerMethodField(read_only=True)
     is_favorited = serializers.SerializerMethodField(read_only=True)
     is_in_shopping_cart = serializers.SerializerMethodField(read_only=True)
+    is_subscribed = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Recipe
@@ -43,6 +45,12 @@ class RecipeSerializer(serializers.ModelSerializer):
             'id', 'tags', 'author', 'ingredients', 'is_favorited',
             'is_in_shopping_cart', 'name', 'image', 'text', 'cooking_time'
         )
+    
+    def get_is_subscribed(self, obj):
+        request = self.context.get('request')
+        if not request or request.user.is_anonymous:
+            return False
+        return Follow.objects.filter(user=request.user, following=obj).exists()
 
     def get_ingredients(self, obj):
         ingredients = IngredientInRecipe.objects.filter(recipe=obj)

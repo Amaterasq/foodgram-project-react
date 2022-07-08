@@ -30,11 +30,9 @@ class CustomUserSerializer(UserSerializer):
 
 
 class FollowSerializer(serializers.ModelSerializer):
-    is_subscribed = serializers.SerializerMethodField(read_only=True)
-
     class Meta:
         model = Follow
-        fields = ('user', 'following', 'is_subscribed')
+        fields = ('user', 'following',)
         validators = [
             UniqueTogetherValidator(
                 queryset=Follow.objects.all(),
@@ -42,12 +40,6 @@ class FollowSerializer(serializers.ModelSerializer):
                 message=('Вы уже подписаны на пользователя')
             )
         ]
-
-    def get_is_subscribed(self, obj):
-        request = self.context.get('request')
-        if not request or request.user.is_anonymous:
-            return False
-        return Follow.objects.filter(user=request.user, following=obj).exists()
 
     def validate(self, data):
         request = self.context.get('request')
@@ -101,7 +93,8 @@ class FollowListSerializer(serializers.ModelSerializer):
         else:
             recipes = obj.recipes.all()
         return FollowRecipesSerializer(
-            recipes, many=True, context=context).data
+            recipes, many=True, context=context
+        ).data
 
     def get_recipes_count(self, obj):
         return obj.recipes.count()
