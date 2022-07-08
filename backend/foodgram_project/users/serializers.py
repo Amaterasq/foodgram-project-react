@@ -30,6 +30,8 @@ class CustomUserSerializer(UserSerializer):
 
 
 class FollowSerializer(serializers.ModelSerializer):
+    is_subscribed = serializers.SerializerMethodField(read_only=True)
+
     class Meta:
         model = Follow
         fields = ('user', 'following')
@@ -40,6 +42,12 @@ class FollowSerializer(serializers.ModelSerializer):
                 message=('Вы уже подписаны на пользователя')
             )
         ]
+
+    def get_is_subscribed(self, obj):
+        request = self.context.get('request')
+        if not request or request.user.is_anonymous:
+            return False
+        return Follow.objects.filter(user=request.user, following=obj).exists()
 
     def validate(self, data):
         request = self.context.get('request')
