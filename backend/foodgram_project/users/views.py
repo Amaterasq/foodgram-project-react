@@ -1,5 +1,4 @@
 from rest_framework import status
-from rest_framework.decorators import action
 from rest_framework.generics import ListAPIView, get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -13,7 +12,6 @@ from users.serializers import FollowListSerializer, FollowSerializer
 class FollowApiView(APIView):
     permission_classes = [IsAuthenticated]
 
-    @action(methods=('post',), detail=False)
     def post(self, request, id):
         data = {'user': request.user.id, 'following': id}
         serializer = FollowSerializer(data=data, context={'request': request})
@@ -21,7 +19,6 @@ class FollowApiView(APIView):
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-    @action(methods=('delete',), detail=False)
     def delete(self, request, id):
         user = request.user
         following = get_object_or_404(User, id=id)
