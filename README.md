@@ -3,7 +3,7 @@
 ![](https://img.shields.io/badge/DjangoRestFramework-3.12.4-red)
 ![](https://badgen.net/badge/icon/postgresql?icon=postgresql&label)
 
-# Foodgram - продуктовый помощник (сейчас доступен на http://84.252.138.93/recipes)
+# Foodgram - продуктовый помощник
 ![workflow](https://github.com/Amaterasq/foodgram-project-react/actions/workflows/foodgram_workflow.yml/badge.svg)
 
 ## Описание проекта
@@ -105,17 +105,6 @@ sudo docker-compose exec backend python manage.py createsuperuser
 ```html
 http://<публичный IP-сервера или localhost>/api/docs/redoc.html
 ```
-
-## :bust_in_silhouette: Авторы проекта 
-### :small_orange_diamond: Влад Перепечко _(Vlad Vi. Perepechko)_
-```html
-e-mail: perepechcko.vlad@ya.ru
-```
-```html
-https://github.com/Amaterasq
-```
-```html
-telegram: @amaterasutengu
 ```
 
 ## Code Style
