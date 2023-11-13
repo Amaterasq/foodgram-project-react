@@ -105,8 +105,3 @@ sudo docker-compose exec backend python manage.py createsuperuser
 ```html
 http://<публичный IP-сервера или localhost>/api/docs/redoc.html
 ```
-```
-
-## Code Style
-
-* [PEP8](https://www.python.org/dev/peps/pep-0008/)
